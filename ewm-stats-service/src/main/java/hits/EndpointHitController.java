@@ -20,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EndpointHitController {
 
+    public static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EndpointHitService service;
 
     @PostMapping("/hit")
@@ -28,13 +29,11 @@ public class EndpointHitController {
     }
 
     @GetMapping("/stats")
-    public List<ViewStats> getStats(@RequestParam(name = "start") @NotNull String start,
-                                    @RequestParam(name = "end") @NotNull String end,
-                                    @RequestParam(name = "uris", required = false) List<String> uris,
-                                    @RequestParam(name = "unique", defaultValue = "false") boolean unique) {
-        LocalDateTime s = LocalDateTime.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        LocalDateTime e = LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        return service.getStats(uris, s, e, unique);
+    public List<ViewStats> getStats(@RequestParam @NotNull String start,
+                                    @RequestParam @NotNull String end,
+                                    @RequestParam(required = false) List<String> uris,
+                                    @RequestParam(defaultValue = "false") boolean unique) {
+        return service.getStats(uris, LocalDateTime.parse(start, DATE), LocalDateTime.parse(end, DATE), unique);
     }
 
 }
