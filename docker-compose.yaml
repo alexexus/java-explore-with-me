@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   stats-server:
-    build: ./ewm-stats-service
+    build: ./ewm-stats-service/ewm-stats-server
     image: ewm-stats-image
     container_name: ewm-stats-container
     ports:
@@ -13,7 +13,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
-      #- TZ=Europe/Samara
+#      - TZ=Europe/Samara
 
   stats-db:
     image: postgres:14-alpine
@@ -24,7 +24,7 @@ services:
       - POSTGRES_DB=ewm
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      #- TZ=Europe/Samara
+#      - TZ=Europe/Samara
 
   ewm-server:
     build: ./ewm-main-service
@@ -40,7 +40,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/main
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
-      #- TZ=Europe/Samara
+#      - TZ=Europe/Samara
 
   ewm-db:
     image: postgres:14-alpine
@@ -51,4 +51,4 @@ services:
       - POSTGRES_DB=main
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      #- TZ=Europe/Samara
+#      - TZ=Europe/Samara
