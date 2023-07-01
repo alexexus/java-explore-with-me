@@ -15,7 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -38,5 +38,5 @@ public class Compilation {
     @JoinTable(name = "compilations_events",
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private List<Event> events;
+    private Set<Event> events;
 }

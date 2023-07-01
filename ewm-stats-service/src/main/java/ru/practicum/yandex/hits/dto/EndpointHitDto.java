@@ -1,4 +1,4 @@
-package ru.practicum.yandex.client;
+package ru.practicum.yandex.hits.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,19 +8,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ViewStats {
+@NoArgsConstructor
+public class EndpointHitDto {
+
+    private long id;
 
     private String app;
 
     private String uri;
 
-    private Long hits;
+    private String ip;
 
+    private LocalDateTime created;
 }

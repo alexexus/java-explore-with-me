@@ -8,17 +8,15 @@ import org.springframework.stereotype.Service;
 import ru.practicum.yandex.categories.CategoryRepository;
 import ru.practicum.yandex.client.StatsService;
 import ru.practicum.yandex.events.dto.UpdateEventRequest;
+import ru.practicum.yandex.events.location.LocationMapper;
 import ru.practicum.yandex.events.location.LocationRepository;
 import ru.practicum.yandex.exception.ConflictException;
 import ru.practicum.yandex.exception.NotFoundException;
 import ru.practicum.yandex.exception.ValidationException;
-import ru.practicum.yandex.requests.EventRequestStatus;
-import ru.practicum.yandex.requests.RequestRepository;
 import ru.practicum.yandex.users.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +26,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
-    public static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EventRepository repository;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
-    private final RequestRepository requestRepository;
     private final UserRepository userRepository;
-    private final StatsService hitClient;
+    private final LocationMapper locationMapper;
+    private final StatsService statsService;
 
     @Override
     public List<Event> getAllEvents(List<Long> users, List<State> states, List<Long> categories,
-                                    String rangeStart, String rangeEnd, Integer from, Integer size) {
+                                    LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
         QEvent event = QEvent.event;
         List<BooleanExpression> options = new ArrayList<>();
         if (users != null) {
@@ -56,9 +53,8 @@ public class EventServiceImpl implements EventService {
                 .reduce(BooleanExpression::and)
                 .get();
         List<Event> events = repository.findAll(expression, PageRequest.of(from / size, size)).toList();
-        events.forEach(e -> e.setConfirmedRequests(requestRepository
-                .findByEventAndStatusIs(e, EventRequestStatus.CONFIRMED).size()));
-        return events;
+
+        return getStats(events);
     }
 
     @Override
@@ -71,9 +67,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<Event> findByText(String text, List<Long> categories, Boolean paid,
-                                  String start, String end, String order, Integer from, Integer size,
-                                  Boolean onlyAvailable, HttpServletRequest httpServletRequest) {
+    public List<Event> findByText(String text, List<Long> categories, Boolean paid, LocalDateTime start,
+                                  LocalDateTime end, String order, Integer from, Integer size, Boolean onlyAvailable,
+                                  HttpServletRequest httpServletRequest) {
         Sort sort = Sort.unsorted();
         if (order != null) {
             if (order.equals("EVENT_DATE")) {
@@ -108,13 +104,8 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toList());
         }
 
-        hitClient.addHit(httpServletRequest);
-        Map<Long, Long> views = hitClient.getViews(events);
-        events = events.stream()
-                .peek(e -> e.setViews(views.get(e.getId())))
-                .collect(Collectors.toList());
-
-        return events;
+        statsService.addHit(httpServletRequest);
+        return getStats(events);
     }
 
     @Override
@@ -124,9 +115,11 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Event not published");
         }
 
-        hitClient.addHit(httpServletRequest);
-        Map<Long, Long> views = hitClient.getViews(List.of(event));
-        event.setViews(views.get(event.getId()));
+        statsService.addHit(httpServletRequest);
+        Map<Long, Long> views = statsService.getViews(List.of(event));
+        Map<Long, Long> confirmedRequests = statsService.getConfirmedRequests(List.of(event));
+        event.setViews(views.getOrDefault(event.getId(), 0L));
+        event.setConfirmedRequests(confirmedRequests.getOrDefault(event.getId(), 0L));
 
         return event;
     }
@@ -181,14 +174,15 @@ public class EventServiceImpl implements EventService {
             oldEvent.setDescription(event.getDescription());
         }
         if (event.getEventDate() != null) {
-            if (getTime(event.getEventDate()).minusHours(2L).isBefore(LocalDateTime.now())) {
+            if (event.getEventDate().minusHours(2L).isBefore(LocalDateTime.now())) {
                 throw new ValidationException("Must contain a date that has not yet arrived");
             }
-            oldEvent.setEventDate(getTime(event.getEventDate()));
+            oldEvent.setEventDate(event.getEventDate());
         }
         if (event.getLocation() != null) {
             oldEvent.setLocation(locationRepository.findByLatAndLon(event.getLocation().getLat(),
-                    event.getLocation().getLon()).orElseGet(() -> locationRepository.save(event.getLocation())));
+                    event.getLocation().getLon()).orElseGet(() -> locationRepository
+                    .save(locationMapper.toLocation(event.getLocation()))));
         }
         if (event.getPaid() != null) {
             oldEvent.setPaid(event.getPaid());
@@ -224,21 +218,28 @@ public class EventServiceImpl implements EventService {
         return repository.save(oldEvent);
     }
 
-    private LocalDateTime getTime(String time) {
-        return LocalDateTime.parse(time, DATE);
+    private List<Event> getStats(List<Event> events) {
+        Map<Long, Long> views = statsService.getViews(events);
+        Map<Long, Long> confirmedRequests = statsService.getConfirmedRequests(events);
+        events = events.stream()
+                .peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))
+                .peek(e -> e.setConfirmedRequests(confirmedRequests.getOrDefault(e.getId(), 0L)))
+                .collect(Collectors.toList());
+
+        return events;
     }
 
-    private void getTimeOptions(String start, String end, QEvent event, List<BooleanExpression> options) {
+    private void getTimeOptions(LocalDateTime start, LocalDateTime end, QEvent event, List<BooleanExpression> options) {
         if (start != null) {
-            options.add(event.eventDate.after(getTime(start)));
+            options.add(event.eventDate.after(start));
         }
         if (end != null) {
-            options.add(event.eventDate.before(getTime(end)));
+            options.add(event.eventDate.before(end));
         }
         if (start == null && end == null) {
             options.add(event.eventDate.after(LocalDateTime.now()));
         }
-        if (start != null && end != null && getTime(start).isAfter(getTime(end))) {
+        if (start != null && end != null && start.isAfter(end)) {
             throw new ValidationException("Start after end");
         }
     }

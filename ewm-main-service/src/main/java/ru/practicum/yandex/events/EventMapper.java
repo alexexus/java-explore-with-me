@@ -7,35 +7,34 @@ import ru.practicum.yandex.categories.CategoryMapper;
 import ru.practicum.yandex.events.dto.EventFullDto;
 import ru.practicum.yandex.events.dto.EventShortDto;
 import ru.practicum.yandex.events.dto.NewEventDto;
+import ru.practicum.yandex.events.location.LocationMapper;
 import ru.practicum.yandex.users.UserMapper;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 @Component
 @AllArgsConstructor
 public class EventMapper {
 
-    public static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final CategoryMapper categoryMapper;
+    private final LocationMapper locationMapper;
     private final UserMapper userMapper;
 
     public EventFullDto toEventFullDto(Event event) {
-        String publishedOn = null;
+        LocalDateTime publishedOn = null;
         if (event.getPublishedOn() != null) {
-            publishedOn = event.getPublishedOn().format(DATE);
+            publishedOn = event.getPublishedOn();
         }
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(categoryMapper.toCategoryDto(event.getCategory()))
                 .confirmedRequests(event.getConfirmedRequests())
-                .createdOn(event.getCreatedOn().format(DATE))
+                .createdOn(event.getCreatedOn())
                 .description(event.getDescription())
-                .eventDate(event.getEventDate().format(DATE))
+                .eventDate(event.getEventDate())
                 .initiator(userMapper.toUserShortDto(event.getInitiator()))
-                .location(event.getLocation())
+                .location(locationMapper.toLocationDto(event.getLocation()))
                 .paid(event.getPaid())
                 .participantLimit(event.getParticipantLimit())
                 .publishedOn(publishedOn)
@@ -52,7 +51,7 @@ public class EventMapper {
                 .annotation(event.getAnnotation())
                 .category(categoryMapper.toCategoryDto(event.getCategory()))
                 .confirmedRequests(event.getConfirmedRequests())
-                .eventDate(event.getEventDate().format(DATE))
+                .eventDate(event.getEventDate())
                 .initiator(userMapper.toUserShortDto(event.getInitiator()))
                 .paid(event.getPaid())
                 .title(event.getTitle())
@@ -67,12 +66,12 @@ public class EventMapper {
                 .confirmedRequests(0L)
                 .createdOn(LocalDateTime.now())
                 .description(event.getDescription())
-                .eventDate(LocalDateTime.parse(event.getEventDate(), DATE))
-                .location(event.getLocation())
-                .paid(Optional.ofNullable(event.getPaid()).orElse(false))
-                .participantLimit(Optional.ofNullable(event.getParticipantLimit()).orElse(0L))
+                .eventDate(event.getEventDate())
+                .location(locationMapper.toLocation(event.getLocation()))
+                .paid(event.isPaid())
+                .participantLimit(event.getParticipantLimit())
                 .publishedOn(null)
-                .requestModeration(Optional.ofNullable(event.getRequestModeration()).orElse(true))
+                .requestModeration(event.isRequestModeration())
                 .state(State.PENDING)
                 .title(event.getTitle())
                 .views(0L)

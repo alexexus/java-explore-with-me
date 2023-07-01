@@ -20,9 +20,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(long id) {
-        getCategoryById(id);
-        repository.deleteById(id);
-
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+        } else {
+            throw new NotFoundException("Category not found");
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package ru.practicum.yandex.categories;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,9 +17,12 @@ import ru.practicum.yandex.categories.dto.CategoryDto;
 import ru.practicum.yandex.categories.dto.NewCategoryDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -51,8 +55,8 @@ public class CategoryController {
     }
 
     @GetMapping("/categories")
-    public List<CategoryDto> getAllCategories(@RequestParam(defaultValue = "0") Integer from,
-                                              @RequestParam(defaultValue = "10") Integer size) {
+    public List<CategoryDto> getAllCategories(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                              @Positive @RequestParam(defaultValue = "10") Integer size) {
         return service.getAllCategories(from, size).stream()
                 .map(mapper::toCategoryDto)
                 .collect(Collectors.toList());

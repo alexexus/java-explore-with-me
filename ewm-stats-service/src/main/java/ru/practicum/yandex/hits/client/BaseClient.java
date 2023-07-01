@@ -1,4 +1,4 @@
-package ru.practicum.yandex.client;
+package ru.practicum.yandex.hits.client;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

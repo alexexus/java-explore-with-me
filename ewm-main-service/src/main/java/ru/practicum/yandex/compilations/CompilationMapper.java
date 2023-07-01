@@ -20,7 +20,7 @@ public class CompilationMapper {
                 .title(compilation.getTitle())
                 .events(compilation.getEvents().stream()
                         .map(eventMapper::toEventShortDto)
-                        .collect(Collectors.toList()))
+                        .collect(Collectors.toSet()))
                 .build();
     }
 }

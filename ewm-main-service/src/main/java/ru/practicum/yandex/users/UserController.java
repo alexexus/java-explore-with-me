@@ -2,6 +2,7 @@ package ru.practicum.yandex.users;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +16,12 @@ import ru.practicum.yandex.users.dto.NewUserRequest;
 import ru.practicum.yandex.users.dto.UserDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping(path = "/admin/users")
 @RequiredArgsConstructor
@@ -40,8 +44,8 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAllUsers(@RequestParam(required = false) List<Long> ids,
-                                     @RequestParam(defaultValue = "0") Integer from,
-                                     @RequestParam(defaultValue = "10") Integer size) {
+                                     @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                     @Positive @RequestParam(defaultValue = "10") Integer size) {
         return service.getAllUsers(ids, from, size).stream()
                 .map(mapper::toUserDto)
                 .collect(Collectors.toList());

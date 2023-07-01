@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,5 +21,5 @@ public class UpdateCompilationRequest {
     @Length(min = 1, max = 50)
     private String title;
 
-    private List<Long> events;
+    private Set<Long> events;
 }

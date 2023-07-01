@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.util.List;
+import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event>,
         QuerydslPredicateExecutor<Event> {
@@ -13,4 +14,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     List<Event> findByInitiatorId(long id, Pageable pageable);
 
     Event findByIdAndInitiatorId(long id, long initiatorId);
+
+    Set<Event> findByIdIn(Set<Long> ids);
 }

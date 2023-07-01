@@ -11,7 +11,6 @@ import ru.practicum.yandex.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,26 +34,27 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public Compilation getCompilationById(long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Compilation not found"));
+        return repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Compilation not found"));
     }
 
     @Override
     public Compilation addCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = Compilation.builder()
-                .pinned(newCompilationDto.getPinned())
+                .pinned(newCompilationDto.isPinned())
                 .title(newCompilationDto.getTitle())
-                .events(newCompilationDto.getEvents().stream()
-                        .map(event -> eventRepository.findById(event)
-                                .orElseThrow(() -> new NotFoundException("Event not found")))
-                        .collect(Collectors.toList()))
+                .events(eventRepository.findByIdIn(newCompilationDto.getEvents()))
                 .build();
         return repository.save(compilation);
     }
 
     @Override
     public void deleteCompilation(long id) {
-        getCompilationById(id);
-        repository.deleteById(id);
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+        } else {
+            throw new NotFoundException("Compilation not found");
+        }
     }
 
     @Override
@@ -67,10 +67,7 @@ public class CompilationServiceImpl implements CompilationService {
             oldCompilation.setTitle(compilation.getTitle());
         }
         if (compilation.getEvents() != null) {
-            oldCompilation.setEvents(compilation.getEvents().stream()
-                    .map(event -> eventRepository.findById(event)
-                            .orElseThrow(() -> new NotFoundException("Event not found")))
-                    .collect(Collectors.toList()));
+            oldCompilation.setEvents(eventRepository.findByIdIn(compilation.getEvents()));
         }
         return repository.save(oldCompilation);
     }

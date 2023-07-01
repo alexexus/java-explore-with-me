@@ -22,16 +22,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(long id) {
-        repository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
-        repository.deleteById(id);
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+        } else {
+            throw new NotFoundException("User not found");
+        }
     }
 
     @Override
     public List<User> getAllUsers(List<Long> ids, Integer from, Integer size) {
-        QUser user = QUser.user;
-        List<BooleanExpression> options = new ArrayList<>();
-
         if (ids != null) {
+            QUser user = QUser.user;
+            List<BooleanExpression> options = new ArrayList<>();
             options.add(user.id.in(ids));
             return repository.findAll(options.get(0), PageRequest.of(from / size, size)).toList();
         }

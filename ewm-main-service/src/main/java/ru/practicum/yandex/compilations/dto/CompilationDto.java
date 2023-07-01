@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.yandex.events.dto.EventShortDto;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,5 +22,5 @@ public class CompilationDto {
 
     private String title;
 
-    private List<EventShortDto> events;
+    private Set<EventShortDto> events;
 }

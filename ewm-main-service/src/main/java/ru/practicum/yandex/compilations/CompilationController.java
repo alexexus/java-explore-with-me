@@ -2,6 +2,7 @@ package ru.practicum.yandex.compilations;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,9 +18,12 @@ import ru.practicum.yandex.compilations.dto.NewCompilationDto;
 import ru.practicum.yandex.compilations.dto.UpdateCompilationRequest;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -30,8 +34,8 @@ public class CompilationController {
 
     @GetMapping("/compilations")
     public List<CompilationDto> getAllPinnedCompilation(@RequestParam(required = false) Boolean pinned,
-                                                        @RequestParam(defaultValue = "0") Integer from,
-                                                        @RequestParam(defaultValue = "10") Integer size) {
+                                                        @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                        @Positive @RequestParam(defaultValue = "10") Integer size) {
         return service.getAllByPinned(pinned, from, size).stream()
                 .map(mapper::toCompilationDto)
                 .collect(Collectors.toList());

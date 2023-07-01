@@ -38,5 +38,4 @@ public class EndpointHit implements Serializable {
     private String ip;
 
     private LocalDateTime created;
-
 }

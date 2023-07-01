@@ -19,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.time.LocalDateTime;
 
 @Getter
@@ -32,7 +33,7 @@ public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String annotation;
 
@@ -40,8 +41,8 @@ public class Event {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(name = "confirmed_requests")
-    private long confirmedRequests;
+    @Transient
+    private Long confirmedRequests;
 
     @Column(name = "created_on")
     private LocalDateTime createdOn;
@@ -75,5 +76,6 @@ public class Event {
 
     private String title;
 
+    @Transient
     private Long views;
 }

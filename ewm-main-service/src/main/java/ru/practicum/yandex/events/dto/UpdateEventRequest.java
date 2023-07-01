@@ -1,5 +1,6 @@
 package ru.practicum.yandex.events.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +9,10 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.yandex.events.StateAction;
 import ru.practicum.yandex.events.location.Location;
+import ru.practicum.yandex.events.location.LocationDto;
+
+import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -24,12 +29,14 @@ public class UpdateEventRequest {
     @Length(min = 20, max = 7000)
     private String description;
 
-    private String eventDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime eventDate;
 
-    private Location location;
+    private LocationDto location;
 
     private Boolean paid;
 
+    @PositiveOrZero
     private Long participantLimit;
 
     private Boolean requestModeration;
