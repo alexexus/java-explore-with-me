@@ -44,7 +44,6 @@ public class CompilationServiceImpl implements CompilationService {
                 .pinned(newCompilationDto.isPinned())
                 .title(newCompilationDto.getTitle())
                 .build();
-
         if (newCompilationDto.getEvents() != null) {
             compilation.setEvents(eventRepository.findByIdIn(newCompilationDto.getEvents()));
         }
