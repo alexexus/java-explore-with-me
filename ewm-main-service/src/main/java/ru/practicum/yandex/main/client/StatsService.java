@@ -72,7 +72,7 @@ public class StatsService {
                     .collect(Collectors.toList());
             List<ViewStats> stats = getStats(
                     minTime.get().format(DATE),
-                    LocalDateTime.now().plusDays(1L).format(DATE),
+                    LocalDateTime.now().format(DATE),
                     uris,
                     true);
             stats.forEach(stat -> {

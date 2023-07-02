@@ -11,6 +11,7 @@ import ru.practicum.yandex.main.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +44,12 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilation = Compilation.builder()
                 .pinned(newCompilationDto.isPinned())
                 .title(newCompilationDto.getTitle())
-                .events(eventRepository.findByIdIn(newCompilationDto.getEvents()))
                 .build();
+
+        if (newCompilationDto.getEvents() != null) {
+            compilation.setEvents(eventRepository.findByIdIn(newCompilationDto.getEvents()));
+        }
+
         return repository.save(compilation);
     }
 

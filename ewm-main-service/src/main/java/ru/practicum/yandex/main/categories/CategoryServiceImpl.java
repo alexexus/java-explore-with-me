@@ -35,9 +35,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category updateCategory(Category category, long id) {
         Category oldCategory = getCategoryById(id);
-        if (category.getName() != null && !category.getName().isBlank()) {
-            oldCategory.setName(category.getName());
-        }
+        oldCategory.setName(category.getName());
+
         return repository.save(oldCategory);
     }
 
