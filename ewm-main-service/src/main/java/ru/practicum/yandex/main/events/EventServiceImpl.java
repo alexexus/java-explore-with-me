@@ -221,9 +221,11 @@ public class EventServiceImpl implements EventService {
     private List<Event> getStats(List<Event> events) {
         Map<Long, Long> views = statsService.getViews(events);
         Map<Long, Long> confirmedRequests = statsService.getConfirmedRequests(events);
+        Map<Long, Long> comments = statsService.getComments(events);
         events = events.stream()
                 .peek(e -> e.setViews(views.getOrDefault(e.getId(), 0L)))
                 .peek(e -> e.setConfirmedRequests(confirmedRequests.getOrDefault(e.getId(), 0L)))
+                .peek(e -> e.setComments(comments.getOrDefault(e.getId(), 0L)))
                 .collect(Collectors.toList());
 
         return events;

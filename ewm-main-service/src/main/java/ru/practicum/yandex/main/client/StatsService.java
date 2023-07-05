@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.practicum.yandex.main.comments.CommentRepository;
 import ru.practicum.yandex.main.events.Event;
 import ru.practicum.yandex.main.requests.RequestRepository;
 import ru.practicum.yandex.stats.client.HitClient;
@@ -30,6 +31,7 @@ public class StatsService {
     public static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final ObjectMapper mapper = new ObjectMapper();
     private final RequestRepository requestRepository;
+    private final CommentRepository commentRepository;
     private final HitClient hitClient;
     @Value(value = "${app.name}")
     private String appName;
@@ -95,6 +97,20 @@ public class StatsService {
         }
 
         return eventsRequests;
+    }
+
+    public Map<Long, Long> getComments(List<Event> events) {
+        List<Long> ids = getPublished(events).stream()
+                .map(Event::getId)
+                .collect(Collectors.toList());
+        Map<Long, Long> eventsComments = new HashMap<>();
+
+        if (!ids.isEmpty()) {
+            commentRepository.getEventsComments(ids)
+                    .forEach(er -> eventsComments.put(er.getEventId(), er.getCount()));
+        }
+
+        return eventsComments;
     }
 
     private List<Event> getPublished(List<Event> events) {

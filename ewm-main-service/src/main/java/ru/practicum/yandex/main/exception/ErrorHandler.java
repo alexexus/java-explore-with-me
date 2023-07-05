@@ -20,7 +20,7 @@ public class ErrorHandler {
             MethodArgumentTypeMismatchException.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleRuntimeException(final RuntimeException e) {
-        log.debug("Получен статус 400 Bad request {}", e.getMessage(), e);
+        log.error("Получен статус 400 Bad request {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
@@ -28,21 +28,21 @@ public class ErrorHandler {
             DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConstraintViolationException(final RuntimeException e) {
-        log.debug("Получен статус 409 Conflict {}", e.getMessage(), e);
+        log.error("Получен статус 409 Conflict {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        log.debug("Получен статус 404 Not found {}", e.getMessage(), e);
+        log.error("Получен статус 404 Not found {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleNotFoundException(final RuntimeException e) {
-        log.debug("Получен статус 500 Internal server error {}", e.getMessage(), e);
+        log.error("Получен статус 500 Internal server error {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 

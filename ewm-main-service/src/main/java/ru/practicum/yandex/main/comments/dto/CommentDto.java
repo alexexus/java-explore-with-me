@@ -1,4 +1,4 @@
-package ru.practicum.yandex.main.events.dto;
+package ru.practicum.yandex.main.comments.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.yandex.main.categories.dto.CategoryDto;
+import ru.practicum.yandex.main.events.dto.EventShortDto;
 import ru.practicum.yandex.main.users.dto.UserShortDto;
 
 import java.time.LocalDateTime;
@@ -16,26 +16,19 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventShortDto {
+public class CommentDto {
 
     private long id;
 
-    private String annotation;
+    private UserShortDto author;
 
-    private CategoryDto category;
+    private EventShortDto event;
 
-    private Long confirmedRequests;
+    private String text;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime eventDate;
+    private LocalDateTime created;
 
-    private UserShortDto initiator;
-
-    private Boolean paid;
-
-    private String title;
-
-    private Long views;
-
-    private Long comments;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime edited;
 }
