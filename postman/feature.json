@@ -26,7 +26,8 @@
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"        comment = rnd.getComment();\r",
 									"        delete comment[\"text\"];\r",
@@ -132,7 +133,8 @@
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"        comment = rnd.getComment();\r",
 									"        comment[\"text\"] = '';\r",
@@ -238,7 +240,8 @@
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"        comment = rnd.getComment();\r",
 									"        comment[\"text\"] = '   ';\r",
@@ -344,7 +347,8 @@
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        comment = rnd.getComment();\r",
 									"    } catch(err) {\r",
 									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
@@ -447,7 +451,8 @@
 									"    try {\r",
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"        comment = rnd.getComment();\r",
 									"    } catch(err) {\r",
@@ -537,119 +542,6 @@
 					"response": []
 				},
 				{
-					"name": "Обновление комментария с полем editable = false",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const main = async () => {\r",
-									"    const api = new API(pm);\r",
-									"    const rnd = new RandomUtils();\r",
-									"\r",
-									"    let comment;\r",
-									"    const notEditableComment = rnd.getComment();\r",
-									"    notEditableComment[\"editable\"] = false;\r",
-									"    try {\r",
-									"        const user = await api.addUser(rnd.getUser());\r",
-									"        pm.collectionVariables.set(\"uid\", user.id);\r",
-									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
-									"        pm.collectionVariables.set(\"eid\", event.id);\r",
-									"        comment = await api.addComment(user.id, event.id, notEditableComment);\r",
-									"        pm.collectionVariables.set(\"comid\", comment.id);\r",
-									"    } catch(err) {\r",
-									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-									"    }\r",
-									"    pm.request.body.update({\r",
-									"        mode: 'raw',\r",
-									"        raw: JSON.stringify(notEditableComment),\r",
-									"        options: { raw: { language: 'json' } }\r",
-									"    });\r",
-									"};\r",
-									"\r",
-									"const interval = setInterval(() => {}, 1000);\r",
-									"\r",
-									"setTimeout(async () => \r",
-									"    {\r",
-									"        try {\r",
-									"            await main();\r",
-									"        } catch (e) {\r",
-									"            console.error(e);\r",
-									"        } finally {\r",
-									"            clearInterval(interval);\r",
-									"        }\r",
-									"    },  \r",
-									"    100 \r",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
-									"    pm.response.to.be.badRequest;    \r",
-									"    pm.response.to.be.withBody;\r",
-									"    pm.response.to.be.json;\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{{request_body}}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/users/:userId/events/:eventId/comments/:commentId",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users",
-								":userId",
-								"events",
-								":eventId",
-								"comments",
-								":commentId"
-							],
-							"variable": [
-								{
-									"key": "userId",
-									"value": "{{uid}}"
-								},
-								{
-									"key": "eventId",
-									"value": "{{eid}}"
-								},
-								{
-									"key": "commentId",
-									"value": "{{comid}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Обновление комментария когда пользователь не автор",
 					"event": [
 						{
@@ -662,14 +554,15 @@
 									"\r",
 									"    let comment;\r",
 									"    const editableComment = rnd.getComment();\r",
-									"    editableComment[\"editable\"] = true;\r",
 									"    try {\r",
 									"        const user1 = await api.addUser(rnd.getUser());\r",
 									"        const user2 = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user2.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event1 = await api.addEvent(user1.id, rnd.getEvent(category.id));\r",
-									"        const event2 = await api.addEvent(user2.id, rnd.getEvent(category.id));\r",
+									"        let event1 = await api.addEvent(user1.id, rnd.getEvent(category.id));\r",
+									"        event1 = await api.publishEvent(event1.id);\r",
+									"        let event2 = await api.addEvent(user2.id, rnd.getEvent(category.id));\r",
+									"        event2 = await api.publishEvent(event2.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event2.id);\r",
 									"        comment = await api.addComment(user1.id, event1.id, editableComment);\r",
 									"        pm.collectionVariables.set(\"comid\", comment.id);\r",
@@ -777,12 +670,12 @@
 									"\r",
 									"    let comment;\r",
 									"    const editableComment = rnd.getComment();\r",
-									"    editableComment[\"editable\"] = true;\r",
 									"    try {\r",
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        comment = await api.addComment(user.id, event.id, editableComment);\r",
 									"        pm.collectionVariables.set(\"comid\", comment.id);\r",
 									"    } catch(err) {\r",
@@ -889,11 +782,11 @@
 									"\r",
 									"    let comment;\r",
 									"    const editableComment = rnd.getComment();\r",
-									"    editableComment[\"editable\"] = true;\r",
 									"    try {\r",
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"        comment = await api.addComment(user.id, event.id, editableComment);\r",
 									"        pm.collectionVariables.set(\"comid\", comment.id);\r",
@@ -1009,7 +902,8 @@
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"        comment = rnd.getComment();\r",
 									"    } catch(err) {\r",
@@ -1060,7 +954,7 @@
 									"pm.expect(target).to.have.property('event');\r",
 									"pm.expect(target).to.have.property('text');\r",
 									"pm.expect(target).to.have.property('created');\r",
-									"pm.expect(target).to.have.property('editable');\r",
+									"pm.expect(target).to.have.property('edited');\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1124,12 +1018,12 @@
 									"\r",
 									"    let comment;\r",
 									"    const editableComment = rnd.getComment();\r",
-									"    editableComment[\"editable\"] = true;\r",
 									"    try {\r",
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"        comment = await api.addComment(user.id, event.id, editableComment);\r",
 									"        pm.collectionVariables.set(\"comid\", comment.id);\r",
@@ -1181,7 +1075,7 @@
 									"pm.expect(target).to.have.property('event');\r",
 									"pm.expect(target).to.have.property('text');\r",
 									"pm.expect(target).to.have.property('created');\r",
-									"pm.expect(target).to.have.property('editable');\r",
+									"pm.expect(target).to.have.property('edited');\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1251,7 +1145,8 @@
 									"    try {\r",
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        const comment = await api.addComment(user.id, event.id, rnd.getComment());\r",
 									"        pm.collectionVariables.set(\"comid\", comment.id);\r",
 									"        pm.collectionVariables.set(\"response\", comment);\r",
@@ -1303,7 +1198,7 @@
 									"pm.expect(target).to.have.property('event');\r",
 									"pm.expect(target).to.have.property('text');\r",
 									"pm.expect(target).to.have.property('created');\r",
-									"pm.expect(target).to.have.property('editable');\r",
+									"pm.expect(target).to.have.property('edited');\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1364,7 +1259,8 @@
 									"    try {\r",
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"        await api.addComment(user.id, event.id, rnd.getComment());\r",
 									"        const comment2 = await api.addComment(user.id, event.id, rnd.getComment());\r",
@@ -1411,7 +1307,7 @@
 									"pm.expect(target).to.have.property('event');\r",
 									"pm.expect(target).to.have.property('text');\r",
 									"pm.expect(target).to.have.property('created');\r",
-									"pm.expect(target).to.have.property('editable');\r",
+									"pm.expect(target).to.have.property('edited');\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1474,7 +1370,8 @@
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        await api.addComment(user.id, event.id, rnd.getComment());\r",
 									"        const comment2 = await api.addComment(user.id, event.id, rnd.getComment());\r",
 									"        pm.collectionVariables.set(\"response\", comment);\r",
@@ -1520,7 +1417,7 @@
 									"pm.expect(target).to.have.property('event');\r",
 									"pm.expect(target).to.have.property('text');\r",
 									"pm.expect(target).to.have.property('created');\r",
-									"pm.expect(target).to.have.property('editable');\r",
+									"pm.expect(target).to.have.property('edited');\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1582,7 +1479,8 @@
 									"    try {\r",
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        const comment = await api.addComment(user.id, event.id, rnd.getComment());\r",
 									"        pm.request.removeQueryParams(['text']);\r",
 									"        pm.request.addQueryParams([`text=` + comment.text]);\r",
@@ -1629,7 +1527,7 @@
 									"pm.expect(target).to.have.property('event');\r",
 									"pm.expect(target).to.have.property('text');\r",
 									"pm.expect(target).to.have.property('created');\r",
-									"pm.expect(target).to.have.property('editable');\r",
+									"pm.expect(target).to.have.property('edited');\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1690,7 +1588,8 @@
 									"        const user = await api.addUser(rnd.getUser());\r",
 									"        pm.collectionVariables.set(\"uid\", user.id);\r",
 									"        const category = await api.addCategory(rnd.getCategory());\r",
-									"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
+									"        event = await api.publishEvent(event.id);\r",
 									"        pm.collectionVariables.set(\"eid\", event.id);\r",
 									"        const comment =  await api.addComment(user.id, event.id, rnd.getComment());\r",
 									"        const foundComment = await api.findComment(comment.id);\r",
@@ -1965,7 +1864,6 @@
 					"    getComment() {",
 					"        return {",
 					"            text: pm.variables.replaceIn('{{$randomLoremParagraph}}'),",
-					"            editable: pm.variables.replaceIn('{{$randomBoolean}}'),",
 					"        }",
 					"    }",
 					"",

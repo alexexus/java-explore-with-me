@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS comments
     event_id  BIGINT                                  NOT NULL,
     text      VARCHAR(2000)                           NOT NULL,
     created   TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
-    editable  BOOLEAN                                 NOT NULL,
+    edited    TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
     CONSTRAINT pk_comment PRIMARY KEY (id),
     CONSTRAINT fk_comments_to_users FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_comments_to_events FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE

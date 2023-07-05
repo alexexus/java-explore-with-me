@@ -42,5 +42,5 @@ public class Comment {
 
     private LocalDateTime created;
 
-    private Boolean editable;
+    private LocalDateTime edited;
 }

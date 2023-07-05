@@ -21,14 +21,13 @@ public class CommentMapper {
                 .event(eventMapper.toEventShortDto(comment.getEvent()))
                 .text(comment.getText())
                 .created(comment.getCreated())
-                .editable(comment.getEditable())
+                .edited(comment.getEdited())
                 .build();
     }
 
     public Comment toComment(NewCommentDto newCommentDto) {
         return Comment.builder()
                 .text(newCommentDto.getText())
-                .editable(newCommentDto.isEditable())
                 .build();
     }
 }

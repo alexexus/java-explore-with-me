@@ -61,6 +61,12 @@ public class CommentController {
         service.deleteComment(commentId, userId, eventId);
     }
 
+    @DeleteMapping("/admin/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable long commentId) {
+        service.deleteCommentByAdmin(commentId);
+    }
+
     @GetMapping("/events/comments/{eventId}")
     public List<CommentDto> getAllCommentsByEventId(@PathVariable long eventId,
                                                     @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,

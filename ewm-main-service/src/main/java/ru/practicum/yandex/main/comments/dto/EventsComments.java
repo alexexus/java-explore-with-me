@@ -5,18 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewCommentDto {
+public class EventsComments {
 
-    @NotBlank
-    @Length(min = 20, max = 2000)
-    private String text;
+    private Long eventId;
+    private Long count;
 }
